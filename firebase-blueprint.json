@@ -1,0 +1,133 @@
+{
+  "entities": {
+    "UserMembership": {
+      "title": "UserMembership",
+      "description": "Information linking a registered user account to a specific Rice Mill commercial licence workspace.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "tenantId": { "type": "string" },
+        "role": { "type": "string", "enum": ["owner", "member"] },
+        "joinedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "userEmail", "tenantId", "role", "joinedAt"]
+    },
+    "LicenceDetails": {
+      "title": "LicenceDetails",
+      "description": "The active commercial licence metadata, such as owner details and registered organization name.",
+      "type": "object",
+      "properties": {
+        "tenantId": { "type": "string" },
+        "name": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "ownerEmail": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["tenantId", "name", "ownerId", "ownerEmail", "createdAt"]
+    },
+    "TenantProfile": {
+      "title": "TenantProfile",
+      "description": "Shared configuration data representing a rice mill's custom directories, stocks, and overheads.",
+      "type": "object",
+      "properties": {
+        "commodities": {
+          "type": "array",
+          "description": "Custom commodities lists"
+        },
+        "ports": {
+          "type": "array",
+          "description": "Custom port directories"
+        },
+        "conditions": {
+          "type": "array",
+          "description": "Export commercial conditions parameters"
+        },
+        "bagPrices": {
+          "type": "object",
+          "description": "Custom brand/size pricing grids in INR"
+        },
+        "bagStock": {
+          "type": "array",
+          "description": "Warehouse bag inventory logs"
+        },
+        "dohaImport": {
+          "type": "object",
+          "description": "Doha local import tariffs and duties specs"
+        },
+        "lineItems": {
+          "type": "array",
+          "description": "Custom CFS/Transport elements"
+        },
+        "cfsItems": {
+          "type": "array",
+          "description": "CHA terminal clearing rows"
+        },
+        "rateList": {
+          "type": "array",
+          "description": "Calculated rate boards and quotation listings"
+        },
+        "companies": {
+          "type": "array",
+          "description": "Active Indian exporter identities"
+        },
+        "buyers": {
+          "type": "array",
+          "description": "Active Global buyer names list"
+        },
+        "buyerLocations": {
+          "type": "array",
+          "description": "Buyer standard destination regions"
+        }
+      },
+      "required": ["commodities", "ports", "conditions", "bagPrices", "bagStock", "dohaImport", "lineItems", "cfsItems", "rateList"]
+    },
+    "SavedQuote": {
+      "title": "SavedQuote",
+      "description": "Comprehensive generated shipment quote containing legal document specs, invoice, packing details, and progress milestones, secured by tenant workspace identifier.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "tenantId": { "type": "string" },
+        "userId": { "type": "string" },
+        "ref": { "type": "string" },
+        "company": { "type": "string" },
+        "buyer": { "type": "string" },
+        "buyerLoc": { "type": "string" },
+        "dest": { "type": "string" },
+        "cond": { "type": "string" },
+        "terms": { "type": "string" },
+        "valid": { "type": "string" },
+        "date": { "type": "string" },
+        "items": { "type": "array" },
+        "html": { "type": "string" },
+        "piStatus": { "type": "string" },
+        "piComment": { "type": "string" },
+        "piHtml": { "type": "string" },
+        "approvedPiUploaded": { "type": "boolean" },
+        "approvedPiFileName": { "type": "string" },
+        "workflow": { "type": "object" },
+        "stageDocs": { "type": "object" }
+      },
+      "required": ["id", "tenantId", "userId", "ref", "company", "buyer", "items"]
+    }
+  },
+  "firestore": {
+    "/user_memberships/{userId}": {
+      "schema": "UserMembership",
+      "description": "Maps individual user IDs to their connected Mill Licence (tenantId)"
+    },
+    "/licences/{tenantId}": {
+      "schema": "LicenceDetails",
+      "description": "Details of the registered Mill Licence, owned by a manager"
+    },
+    "/tenant_profiles/{tenantId}": {
+      "schema": "TenantProfile",
+      "description": "Shared commodities, stocks, rates, and charges belonging to a specific Mill Licence"
+    },
+    "/quotes/{quoteId}": {
+      "schema": "SavedQuote",
+      "description": "Centralized database quote documents belonging to a specific Mill Licence"
+    }
+  }
+}

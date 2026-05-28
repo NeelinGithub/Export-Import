@@ -1,0 +1,140 @@
+================================================================================
+RICE EXPORT MANAGER - DEVELOPMENT HISTORY & PROMPTS ENGINE SUMMARY
+================================================================================
+
+This document chronicles the complete development roadmap, earlier requests/prompts,
+and precise architectural actions taken to build the "Rice Export Manager" application.
+
+--------------------------------------------------------------------------------
+PART 1: CENTRAL APPLICATION ARCHITECTURE & CONTEXT
+--------------------------------------------------------------------------------
+The Rice Export Manager is a full-stack, enterprise-grade multi-tenant web application
+designed to manage agricultural grain export supply chains. It supports real-time
+pricing, container calculations, packaging stocks, CFS and logistics, Proforma /
+Commercial / Packing List generation, Firebase Cloud Authentication, OTP PIN locks,
+licensing gates, and comprehensive inventory status checks.
+
+Core System Stack:
+- Frontend: React 18 / Vite / TypeScript / Tailwind CSS / Lucide Icons / Framer Motion
+- Backend: Express Server with lazy-initialized production configuration
+- Persistence: Firebase Firestore & Authentication with advanced security rules
+- Deployment Environment: Sandboxed Cloud Run container on Port 3000 with nginx reverse proxy
+
+--------------------------------------------------------------------------------
+PART 2: CHRONOLOGICAL SEQUENCE OF USER PROMPTS & SYSTEM ACTIONS
+--------------------------------------------------------------------------------
+
+[STAGE 1]: THE FOUNDATIONAL SYSTEM SEEDING & SETUP
+- Prompt Concept: "Create a Rice Export Management System to handle ex-mill prices,
+  freight transport, and proforma generator."
+- Core Actions:
+  * Handled the initial layout using a custom Sidebar drawer system (`/src/components/Sidebar.tsx`)
+    and built the main dashboard portal (`/src/components/LandingPage.tsx`).
+  * Initiated the database structure for `commodities`, `ports`, `bagPrices`,
+    and `rateList` with real-time persistent synchronization logic.
+  * Extracted core state managers and configurations to `/src/types.ts` and `/src/constants.ts`
+    to enforce strong TypeScript typing across the entire platform.
+
+[STAGE 2]: ADVANCED CONTAINER TRANSPORT & INTEGRATED LOGISTICS MODULES
+- Prompt Concept: "Incorporate Container Freight Station and logistics overhead management."
+- Core Actions:
+  * Engineered `/src/components/CfsTransport.tsx` to handle CFS cargo handling charges,
+    clearing surcharges, custom duty overrides, and in-land logistics/transport pricing.
+  * Interfaced the calculations dynamically with `/src/components/RateCalculator.tsx` to ensure
+    whenever CFS pricing or container configurations toggle, all weight matrices and landed 
+    costs recalculate in real time.
+
+[STAGE 3]: DOHA SURCHARGE LANDLAND AND CURRENCY CONVERSIONS
+- Prompt Concept: "Support Doha landing costs, import overhead management, and currency exchanges."
+- Core Actions:
+  * Implemented `/src/components/DohaImport.tsx` module allowing users to inject custom Doha port 
+    surcharges, customs tariffs, exchange weights, and cargo processing overheads directly inside
+    the global calculator state.
+
+[STAGE 4]: FIREBASE INTEGRATION, USER MEMBERSHIPS & MULTI-TENANCY CONTROL
+- Prompt Concept: "Integrate user logins, cloud synchronization, and company licensing controls."
+- Core Actions:
+  * Provisioned Firebase Firestore (`firestore.rules`, `firebase-blueprint.json`)
+    and integrated secure OAuth elements inside `/src/firebase.ts`.
+  * Designed `/src/components/AuthScreen.tsx` to manage login/signup states.
+  * Built dynamic tenant profiling (`/src/services/db.ts`) where users are routed to multi-tenant 
+    workspace nodes mapped to physical mill licenses.
+  * Created `/src/components/LicenceManager.tsx` enabling module activation overrides
+    (e.g., locking/unlocking the Grain Inventory or Bag Stock subsystems dynamically).
+
+[STAGE 5]: SECURITY ORIENTED TRANSFERS - OTP SECURITY GATES
+- Prompt Concept: "Protect high-privilege operations with verification pins."
+- Core Actions:
+  * Developed `/src/components/OtpSecurityGate.tsx` to enforce custom PIN matrix authentication 
+    before deleting records, exporting high-value quotes, or unlocking system configurations.
+
+[STAGE 6]: GLOBAL SAVED QUOTES REGISTER & DOCUMENT GENERATION (PI, CI, PL, BL)
+- Prompt Concept: "Allow users to save quotes, generate export-ready A4 Proforma Invoice (PI), 
+  Commercial Invoices (CI), and Packing Lists (PL)."
+- Core Actions:
+  * Designed `/src/components/SavedQuotes.tsx` to manage custom quote records and revision lists.
+  * Created `/src/components/DocumentWorkspace.tsx` featuring visual representations of 
+    A4 paper, customizable templates, payment term selectors, and dynamic PDF simulation prints.
+  * Coupled `/src/components/QuoteSheet.tsx` as the print stylesheet layout.
+
+[STAGE 7]: REAL-TIME TRANSIT VESSEL & CONTAINER TRACKERS
+- Prompt Concept: "Add trackers for terminal vessel schedules and container statuses."
+- Core Actions:
+  * Built `/src/components/VesselScheduleExplorer.tsx` enabling deep tracking of shipping Lines,
+    estimated times of arrival (ETA), times of departure (ETD), and port transits.
+  * Created `/src/components/ContainerTracker.tsx` displaying Kanban-style status flows
+    (e.g., Gate-In, Loaded, In-Transit, Customs Cleared, Discharged) for individual FCL loads.
+
+[STAGE 8]: GRAIN INVENTORY AND PACKAGING STOCKS MODULE COUPLING
+- Prompt Concept: "Sync billing quotes against physical grain inventory silos and bag warehouses."
+- Core Actions:
+  * Developed `/src/components/InventoryManager.tsx` (managing paddy and processed rice stocks)
+    and `/src/components/BagPriceAndStock.tsx` (managing BOPP, Laminated, and Jute bag inventories).
+  * Tied Saved Quotes check matrices directly with grain availability.
+
+[STAGE 9]: DYNAMIC CONFIGURATION ALIGNMENTS, LIVE CONTROLS & MODULE TOGGLES (RECENT WORK)
+- Prompt Concept 1: "Keep last entered data in the Rate Calculator, and add a small clear button at the top to enter new info."
+  * Action: Optimized state management within `RateCalculator.tsx` to cache current weight/bag inputs, 
+    adding a top-side "Reset Form / Enter New Info" toggle to clear overrides without breaking local state.
+- Prompt Concept 2: "Show company short name next to the branding headers."
+  * Action: Integrated dynamic metadata parsing into header components to retrieve the tenant's short name
+    from `licenceMetadata` or active workspaces.
+- Prompt Concept 3: "Display the prospective Buyer Name in a dedicated column on the Saved Quotes sheet."
+  * Action: Patched `/src/components/SavedQuotes.tsx` data table columns, adding a specialized Buyer cell.
+- Prompt Concept 4: "Enable/disable grain inventory visual matching status conditionally if the module is locked."
+  * Action: Propagated `isInventoryEnabled={isModuleEnabled('grain_inventory')}` to all sub-components.
+
+--------------------------------------------------------------------------------
+PART 3: DIRECTORY MAP & FUNCTIONAL OWNERS
+--------------------------------------------------------------------------------
+
+1. ROOT DIRECTORY:
+   - `package.json`         <- Directs npm dependencies and startup commands (dev / build / start).
+   - `server.ts`            <- Handles static assets and server-side API endpoints on Cloud Run.
+   - `metadata.json`        <- Primary application manifest containing metadata.
+   - `firestore.rules`      <- Secure structural definitions for cloud tables.
+
+2. SOURCE ROOT (`/src`):
+   - `App.tsx`              <- The core router, tab controller, global state and Firebase auth hook.
+   - `types.ts`             <- Absolute typing system for Quotes, Bags, Landings, and Inventories.
+   - `storage.ts`           <- LocalStorage helper module fallback for offline configurations.
+   - `constants.ts`         <- Seed defaults and core constants.
+
+3. REACT COMPONENTS (`/src/components`):
+   - `RateCalculator.tsx`   <- Live ex-mill pricing and packaging spec simulator.
+   - `RateListBoard.tsx`    <- Unified spreadsheet showing calculated metric tons & bag totals.
+   - `SavedQuotes.tsx`      <- List of all saved proformas and active status tags.
+   - `DocumentWorkspace.tsx`<- Rich A4 container editor for invoices/packing lists.
+   - `CfsTransport.tsx`     <- Local transport and port clearance costs.
+   - `InventoryManager.tsx` <- Warehouse stock controller.
+   - `BagPriceAndStock.tsx` <- Bag pricing models.
+   - `DohaImport.tsx`       <- Surcharge landing calculations.
+   - `VesselScheduleExplorer` <- Tracking transit lines.
+   - `ContainerTracker.tsx` <- Container shipping milestones.
+   - `OtpSecurityGate.tsx`  <- PIN matrix protection block.
+   - `LicenceManager.tsx`   <- Active feature license switcher.
+   - `AuthScreen.tsx`       <- User gatekeeper for cloud accounts.
+
+================================================================================
+Generated on May 28, 2026. Optimized for Rice Export Manager System integrations.
+================================================================================

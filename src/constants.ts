@@ -1,0 +1,497 @@
+import { Commodity, Port, Condition, BagPrices, BagStockItem, DohaImportData, ExpenseItem, RateRow } from './types';
+
+export const INITIAL_COMMODITIES: Commodity[] = [
+  // Grain Presets (Typical ex-mill INR/KG rates)
+  { id: 1, name: "SONA MASOORI STEAM RICE", exmill: 52, industry: "grain" },
+  { id: 2, name: "SONA MASOORI PARBOILED RICE", exmill: 50, industry: "grain" },
+  { id: 3, name: "SONA MASOORI CREAMY SELLA RICE", exmill: 54, industry: "grain" },
+  { id: 4, name: "IR-64 PARBOILED RICE", exmill: 36, industry: "grain" },
+  { id: 5, name: "PR-11 STEAM RICE", exmill: 44, industry: "grain" },
+  { id: 6, name: "PR-11 SELLA RICE", exmill: 44, industry: "grain" },
+  { id: 7, name: "POONI PARBOILED RICE", exmill: 48, industry: "grain" },
+  { id: 8, name: "JEERAKASALA RICE", exmill: 85, industry: "grain" },
+  { id: 9, name: "PUFFED RICE", exmill: 40, industry: "grain" },
+  { id: 10, name: "1401 STEAM BASMATI RICE", exmill: 88, industry: "grain" },
+  { id: 11, name: "1401 CREAMY SELLA BASMATI RICE", exmill: 84, industry: "grain" },
+  { id: 12, name: "1401 GOLDEN SELLA BASMATI RICE", exmill: 92, industry: "grain" },
+  { id: 13, name: "1509 STEAM BASMATI RICE", exmill: 78, industry: "grain" },
+  { id: 14, name: "1509 CREAMY SELLA BASMATI RICE", exmill: 74, industry: "grain" },
+  { id: 15, name: "1509 GOLDEN SELLA BASMATI RICE", exmill: 82, industry: "grain" },
+  { id: 16, name: "1121 STEAM BASMATI RICE", exmill: 105, industry: "grain" },
+  { id: 17, name: "1121 CREAMY SELLA BASMATI RICE", exmill: 100, industry: "grain" },
+  { id: 18, name: "1121 GOLDEN SELLA BASMATI RICE", exmill: 112, industry: "grain" },
+  { id: 19, name: "1718 STEAM BASMATI RICE", exmill: 98, industry: "grain" },
+  { id: 20, name: "1718 CREAMY SELLA BASMATI RICE", exmill: 94, industry: "grain" },
+  { id: 21, name: "INDIAN STEAM BASMATI RICE", exmill: 95, industry: "grain" },
+  { id: 22, name: "SUGHANDA SELLA RICE", exmill: 68, industry: "grain" },
+  { id: 23, name: "SUGANDHA CREAMY SELLA BASMATI RICE", exmill: 65, industry: "grain" },
+  { id: 24, name: "SUGANDHA GOLDEN SELLA BASMATI RICE", exmill: 72, industry: "grain" },
+  { id: 25, name: "50% 1121 + 50% SUGHANDA SELLA", exmill: 84, industry: "grain" },
+  { id: 26, name: "BLENDED (MIX) RICE", exmill: 50, industry: "grain" },
+
+  // Spices Presets
+  { id: 101, name: "GUNTUR RED CHILI S17", exmill: 240, industry: "spices" },
+  { id: 102, name: "UNPROCESSED BLACK PEPPER", exmill: 450, industry: "spices" },
+  { id: 103, name: "PREMIUM TURMERIC FINGER", exmill: 185, industry: "spices" },
+  { id: 104, name: "ORGANIC GREEN CARDAMOM", exmill: 1150, industry: "spices" },
+  { id: 105, name: "CUMIN SEEDS (JEERA) WHOLE", exmill: 320, industry: "spices" },
+  { id: 106, name: "CORIANDER POWDER EXPORT", exmill: 140, industry: "spices" },
+
+  // Chemicals Presets
+  { id: 201, name: "CAUSTIC SODA FLAKES", exmill: 42, industry: "chemicals" },
+  { id: 202, name: "GLACIAL ACETIC ACID", exmill: 58, industry: "chemicals" },
+  { id: 203, name: "LINEAR ALKYL BENZENE", exmill: 112, industry: "chemicals" },
+  { id: 204, name: "PRECIPITATED SILICA GRADE-A", exmill: 65, industry: "chemicals" },
+  { id: 205, name: "HYDROGEN PEROXIDE 50%", exmill: 48, industry: "chemicals" },
+
+  // Salts Presets
+  { id: 301, name: "CRYSTALLINE HALITE REFINED SALT", exmill: 8.5, industry: "salts" },
+  { id: 302, name: "PINK HIMALAYAN ROCK SALT", exmill: 24, industry: "salts" },
+  { id: 303, name: "PURE SODIUM CHLORIDE 99%", exmill: 9.2, industry: "salts" },
+  { id: 304, name: "INDUSTRIAL DE-ICING SALT", exmill: 4.8, industry: "salts" },
+  { id: 305, name: "IODIZED VACUUM SALT (FREE FLOW)", exmill: 12.5, industry: "salts" },
+
+  // Vegetables & Fruits Presets
+  { id: 401, name: "FRESH CAVENDISH BANANAS", exmill: 35, industry: "vegetables_fruits" },
+  { id: 402, name: "PREMIUM ALPHONSO MANGOES", exmill: 120, industry: "vegetables_fruits" },
+  { id: 403, name: "RED GLOBE TABLE GRAPES", exmill: 98, industry: "vegetables_fruits" },
+  { id: 404, name: "FRESH RED ONIONS 45MM+", exmill: 22, industry: "vegetables_fruits" },
+  { id: 405, name: "SWEET VALENCIA ORANGES", exmill: 45, industry: "vegetables_fruits" },
+  { id: 406, name: "PREMIUM POMEGRANATE BOX EXPORT", exmill: 135, industry: "vegetables_fruits" },
+  { id: 407, name: "HOT GREEN CHILI BOX GRADE-A", exmill: 72, industry: "vegetables_fruits" },
+  { id: 408, name: "FRESH HOLLAND POTATOES MESH PACK", exmill: 26, industry: "vegetables_fruits" },
+
+  // Ceramic Tiles & Granite Stone Presets
+  { id: 501, name: "600x600 PORCELAIN GVT GLOSSY TILES", exmill: 320, industry: "tiles" },
+  { id: 502, name: "600x1200 DOUBLE CHARGED VITRIFIED TILES", exmill: 480, industry: "tiles" },
+  { id: 503, name: "300x600 CERAMIC WALL GLOSSY TILES", exmill: 195, industry: "tiles" },
+  { id: 504, name: "800x800 NANO POLISHED VITRIFIED TILES", exmill: 410, industry: "tiles" },
+  { id: 505, name: "20MM ABSOLUTE BLACK POLISHED GRANITE SLABS", exmill: 1250, industry: "tiles" },
+  { id: 506, name: "30MM IMPERIAL RED GRANITE SLABS", exmill: 1450, industry: "tiles" },
+  { id: 507, name: "20MM STEEL GREY GRANITE TILES", exmill: 880, industry: "tiles" }
+];
+
+export const INITIAL_PORTS: Port[] = [
+  "DAMMAM", "RIYADH", "JEDDAH", "SOHAR", "HAMAD", "JEBEL ALI", "DAKAR", "SALALAH",
+  "MUNDRA", "LOME", "NEWARK", "SHUAIBA", "SIHANHOUK", "BRUNIE", "MANILA", "ISKENDERUN",
+  "BANDAR ABBAS", "MUSCAT", "MANAMA", "SHUWAIKH"
+];
+
+export const INITIAL_CONDITIONS: Condition[] = [
+  { code: "CIF", desc: "Cost + Insurance + Freight" },
+  { code: "FOB", desc: "Free on Board" },
+  { code: "CF", desc: "Cost & Freight" }
+];
+
+export const INITIAL_BAGS: BagPrices = {
+  // Grain
+  "BOPP BAGS": [
+    { id: "b1", size: 35, price: 37 },
+    { id: "b2", size: 20, price: 18 },
+    { id: "b3", size: 18, price: 20 },
+    { id: "b4", size: 10, price: 14.5 },
+    { id: "b5", size: 5, price: 11 }
+  ],
+  "JUTE BAGS": [
+    { id: "j1", size: 40, price: 116 },
+    { id: "j2", size: 38, price: 105 },
+    { id: "j3", size: 35, price: 92 },
+    { id: "j4", size: 10, price: 49 },
+    { id: "j5", size: 5, price: 37.5 }
+  ],
+  "NON WOVEN BAGS": [
+    { id: "n1", size: 35, price: 49 },
+    { id: "n2", size: 20, price: 42 },
+    { id: "n3", size: 18, price: 32 },
+    { id: "n4", size: 10, price: 29 },
+    { id: "n5", size: 5, price: 24.5 }
+  ],
+  "WHITE PP BAGS": [
+    { id: "w1", size: 50, price: 15 },
+    { id: "w2", size: 25, price: 10 }
+  ],
+  "DOUBLE BROWN JUTE BAGS": [
+    { id: "d1", size: 40, price: 125 }
+  ],
+  "LDPE BAGS": [
+    { id: "l1", size: 20, price: 14 }
+  ],
+  "JUMBO BAGS": [
+    { id: "jb1", size: 1000, price: 450 }
+  ],
+
+  // Vegetables & Fruits
+  "FIBER CARTONS": [
+    { id: "fc1", size: 5, price: 35 },
+    { id: "fc2", size: 10, price: 45 },
+    { id: "fc3", size: 15, price: 55 }
+  ],
+  "OPEN CRATES": [
+    { id: "oc1", size: 15, price: 65 },
+    { id: "oc2", size: 20, price: 75.05 }
+  ],
+  "MESH SACKS": [
+    { id: "ms1", size: 20, price: 12 },
+    { id: "ms2", size: 25, price: 15 },
+    { id: "ms3", size: 30, price: 18 }
+  ],
+
+  // Spices
+  "PP SPICE BAGS": [
+    { id: "ps1", size: 25, price: 12 },
+    { id: "ps2", size: 50, price: 18 }
+  ],
+  "JUTE SPICE BAGS": [
+    { id: "js1", size: 25, price: 45 },
+    { id: "js2", size: 40, price: 78 }
+  ],
+  "KRAFT PAPER BAGS": [
+    { id: "kp1", size: 10, price: 15 },
+    { id: "kp2", size: 25, price: 28 }
+  ],
+  "HDPE POUCHES": [
+    { id: "hp1", size: 1, price: 2.5 },
+    { id: "hp2", size: 5, price: 6.5 }
+  ],
+
+  // Chemicals
+  "HDPE DRUMS": [
+    { id: "hd1", size: 200, price: 1200 }
+  ],
+  "STEEL DRUMS": [
+    { id: "sd1", size: 200, price: 1800 }
+  ],
+  "IBC TOTES": [
+    { id: "it1", size: 1000, price: 7500 }
+  ],
+  "KRAFT BAGS": [
+    { id: "kb1", size: 25, price: 40 }
+  ],
+
+  // Salts
+  "PP SALT BAGS": [
+    { id: "pas1", size: 25, price: 9.5 },
+    { id: "pas2", size: 50, price: 14.5 }
+  ],
+  "HDPE SALT BAGS": [
+    { id: "has1", size: 25, price: 14.0 },
+    { id: "has2", size: 50, price: 22.0 }
+  ],
+  "JUMBO FIBC BAGS": [
+    { id: "jf1", size: 1000, price: 380.0 }
+  ],
+
+  // Tiles
+  "WOODEN PALLETS": [
+    { id: "wp1", size: 1, price: 850 }
+  ],
+  "CARDBOARD BOXES": [
+    { id: "cb1", size: 1, price: 18 }
+  ],
+  "STRAPPED CRATES": [
+    { id: "sc1", size: 1, price: 550 }
+  ],
+
+  // Generic
+  "STANDARD CARTONS": [
+    { id: "stc1", size: 10, price: 25 },
+    { id: "stc2", size: 20, price: 35 }
+  ],
+  "PALLET PACKS": [
+    { id: "pap1", size: 1, price: 450 }
+  ],
+  "FIBER DRUMS": [
+    { id: "fd1", size: 50, price: 300 }
+  ],
+  "BULK PACKS": [
+    { id: "bp1", size: 1, price: 0 }
+  ]
+};
+
+export const INDUSTRY_PACKAGING: Record<string, {
+  name: string;
+  title: string;
+  packLabel: string;
+  sizeLabel: string;
+  costLabel: string;
+  categories: string[];
+  defaultSizes: { [category: string]: Array<{ size: number; price: number }> };
+  defaultPayload: string;
+}> = {
+  grain: {
+    name: "Grain & Rice",
+    title: "Grain Commodity Specifications",
+    packLabel: "Primary Bag Material",
+    sizeLabel: "Bag Size Capacity (KG)",
+    costLabel: "Inward Bag Cost (₹/Bag)",
+    categories: ["BOPP BAGS", "JUTE BAGS", "NON WOVEN BAGS", "WHITE PP BAGS", "DOUBLE BROWN JUTE BAGS", "LDPE BAGS", "JUMBO BAGS"],
+    defaultSizes: {
+      "BOPP BAGS": [
+        { size: 35, price: 37 },
+        { size: 20, price: 18 },
+        { size: 18, price: 20 },
+        { size: 10, price: 14.5 },
+        { size: 5, price: 11 }
+      ],
+      "JUTE BAGS": [
+        { size: 40, price: 116 },
+        { size: 38, price: 105 },
+        { size: 35, price: 92 },
+        { size: 10, price: 49 },
+        { size: 5, price: 37.5 }
+      ],
+      "NON WOVEN BAGS": [
+        { size: 35, price: 49 },
+        { size: 20, price: 42 },
+        { size: 18, price: 32 },
+        { size: 10, price: 29 },
+        { size: 5, price: 24.5 }
+      ],
+      "WHITE PP BAGS": [
+        { size: 50, price: 15 },
+        { size: 25, price: 10 }
+      ],
+      "DOUBLE BROWN JUTE BAGS": [
+        { size: 40, price: 125 }
+      ],
+      "LDPE BAGS": [
+        { size: 20, price: 14 }
+      ],
+      "JUMBO BAGS": [
+        { size: 1000, price: 450 }
+      ]
+    },
+    defaultPayload: "26000"
+  },
+  vegetables_fruits: {
+    name: "Vegetables & Fruits",
+    title: "Fresh Fruits & Vegetables Specifications",
+    packLabel: "Primary Packing Type",
+    sizeLabel: "Box / Bag Size",
+    costLabel: "Inward Cost (₹ / Bag or Box)",
+    categories: ["FIBER CARTONS", "OPEN CRATES", "MESH SACKS"],
+    defaultSizes: {
+      "FIBER CARTONS": [
+        { size: 5, price: 35 },
+        { size: 10, price: 45 },
+        { size: 15, price: 55 }
+      ],
+      "OPEN CRATES": [
+        { size: 15, price: 65 },
+        { size: 20, price: 75.05 }
+      ],
+      "MESH SACKS": [
+        { size: 20, price: 12 },
+        { size: 25, price: 15 },
+        { size: 30, price: 18 }
+      ]
+    },
+    defaultPayload: "18000"
+  },
+  spices: {
+    name: "Spices",
+    title: "Spices Commodity Specifications",
+    packLabel: "Primary Bag Material",
+    sizeLabel: "Bag Size Capacity (KG)",
+    costLabel: "Inward Bag Cost (₹/Bag)",
+    categories: ["PP SPICE BAGS", "JUTE SPICE BAGS", "KRAFT PAPER BAGS", "HDPE POUCHES"],
+    defaultSizes: {
+      "PP SPICE BAGS": [
+        { size: 25, price: 12 },
+        { size: 50, price: 18 }
+      ],
+      "JUTE SPICE BAGS": [
+        { size: 25, price: 45 },
+        { size: 40, price: 78 }
+      ],
+      "KRAFT PAPER BAGS": [
+        { size: 10, price: 15 },
+        { size: 25, price: 28 }
+      ],
+      "HDPE POUCHES": [
+        { size: 1, price: 2.5 },
+        { size: 5, price: 6.5 }
+      ]
+    },
+    defaultPayload: "15000"
+  },
+  chemicals: {
+    name: "Chemicals",
+    title: "Chemical & Industrial Specifications",
+    packLabel: "Primary Containment Type",
+    sizeLabel: "Containment Size",
+    costLabel: "Inward Cost (₹ / Unit)",
+    categories: ["HDPE DRUMS", "STEEL DRUMS", "IBC TOTES", "KRAFT BAGS"],
+    defaultSizes: {
+      "HDPE DRUMS": [
+        { size: 200, price: 1200 }
+      ],
+      "STEEL DRUMS": [
+        { size: 200, price: 1800 }
+      ],
+      "IBC TOTES": [
+        { size: 1000, price: 7500 }
+      ],
+      "KRAFT BAGS": [
+        { size: 25, price: 40 }
+      ]
+    },
+    defaultPayload: "20000"
+  },
+  salts: {
+    name: "Salts & Minerals",
+    title: "Salts & Minerals Specifications",
+    packLabel: "Primary Bag Material",
+    sizeLabel: "Bag Size Capacity (KG)",
+    costLabel: "Inward Bag Cost (₹/Bag)",
+    categories: ["PP SALT BAGS", "HDPE SALT BAGS", "JUMBO FIBC BAGS"],
+    defaultSizes: {
+      "PP SALT BAGS": [
+        { size: 25, price: 9.5 },
+        { size: 50, price: 14.5 }
+      ],
+      "HDPE SALT BAGS": [
+        { size: 25, price: 14.0 },
+        { size: 50, price: 22.0 }
+      ],
+      "JUMBO FIBC BAGS": [
+        { size: 1000, price: 380.0 }
+      ]
+    },
+    defaultPayload: "27000"
+  },
+  tiles: {
+    name: "Ceramic Tiles & Granite",
+    title: "Ceramic Tiles Special Measurements & Pallet Loading",
+    packLabel: "Tiles Packaging Standard",
+    sizeLabel: "Tile Dimensions Check",
+    costLabel: "Inward Box / Pallet Cost (₹)",
+    categories: ["WOODEN PALLETS", "CARDBOARD BOXES", "STRAPPED CRATES"],
+    defaultSizes: {
+      "WOODEN PALLETS": [
+        { size: 1, price: 850 }
+      ],
+      "CARDBOARD BOXES": [
+        { size: 1, price: 18 }
+      ],
+      "STRAPPED CRATES": [
+        { size: 1, price: 550 }
+      ]
+    },
+    defaultPayload: "27500"
+  },
+  generic: {
+    name: "Generic Products & Freight",
+    title: "Generic Cargo Specifications",
+    packLabel: "Primary Outer Packaging",
+    sizeLabel: "Packaging Size Size",
+    costLabel: "Inward Cost (₹ / Pack)",
+    categories: ["STANDARD CARTONS", "PALLET PACKS", "FIBER DRUMS", "BULK PACKS"],
+    defaultSizes: {
+      "STANDARD CARTONS": [
+        { size: 10, price: 25 },
+        { size: 20, price: 35 }
+      ],
+      "PALLET PACKS": [
+        { size: 1, price: 450 }
+      ],
+      "FIBER DRUMS": [
+        { size: 50, price: 300 }
+      ],
+      "BULK PACKS": [
+        { size: 1, price: 0 }
+      ]
+    },
+    defaultPayload: "22000"
+  }
+};
+
+export const INITIAL_BAG_STOCK: BagStockItem[] = [
+  // Grain
+  { id: "bs1", brand: "PRAN", pack: "BOPP BAGS", kg: 20, stock: 1200, supplier: "Apex Polymers", leadTime: "7-10 days", notes: "Premium BOPP" },
+  { id: "bs2", brand: "PRAN", pack: "BOPP BAGS", kg: 18, stock: 450, supplier: "Apex Polymers", leadTime: "7-10 days", notes: "Pre-printed" },
+  { id: "bs3", brand: "RETAJ", pack: "BOPP BAGS", kg: 35, stock: 850, supplier: "TBD Supplier", leadTime: "7-10 days", notes: "Verify design" },
+  { id: "bs4", brand: "NOORA GOLD", pack: "BOPP BAGS", kg: 20, stock: 0, supplier: "Oman Pack Co.", leadTime: "12 days", notes: "Lead time confirmed" },
+  { id: "bs5", brand: "NOT-DEFINED", pack: "JUTE BAGS", kg: 40, stock: 3500, supplier: "Calcutta Jute Mills", leadTime: "5-7 days", notes: "Generic brown Jute" },
+  { id: "bs6", brand: "NOT-DEFINED", pack: "NON WOVEN BAGS", kg: 35, stock: 0, supplier: "TBD Supplier", leadTime: "7-10 days", notes: "" },
+
+  // Vegetables & Fruits
+  { id: "bs_vf1", brand: "FARM-FRESH", pack: "FIBER CARTONS", kg: 10, stock: 2500, supplier: "Nitin Corrugators", leadTime: "3-5 days", notes: "Ventilated cardboard fruit boxes" },
+  { id: "bs_vf2", brand: "AL-SHAMAL", pack: "OPEN CRATES", kg: 15, stock: 800, supplier: "National Plastics QA", leadTime: "2 days", notes: "Heavy-duty nesting crates" },
+  { id: "bs_vf3", brand: "NOT-DEFINED", pack: "MESH SACKS", kg: 25, stock: 4200, supplier: "Ganges Netting", leadTime: "5 days", notes: "Red leno onion bags" },
+
+  // Spices
+  { id: "bs_sp1", brand: "CHILI-PRO", pack: "PP SPICE BAGS", kg: 25, stock: 1500, supplier: "Hindustan Fibres", leadTime: "7 days", notes: "Laminated moisture-proof bags" },
+  { id: "bs_sp2", brand: "NOT-DEFINED", pack: "JUTE SPICE BAGS", kg: 40, stock: 950, supplier: "Ludlow Jute Ltd", leadTime: "10 days", notes: "Varnished spice canvas sacks" },
+  { id: "bs_sp3", brand: "ORGANIC-PURE", pack: "KRAFT PAPER BAGS", kg: 10, stock: 3000, supplier: "EcoPack India", leadTime: "4 days", notes: "Food-grade double lined paper" },
+
+  // Chemicals
+  { id: "bs_ch1", brand: "SINO-CHEM", pack: "HDPE DRUMS", kg: 200, stock: 450, supplier: "BD Barrel Co.", leadTime: "10 days", notes: "UN certified blue plastic drums" },
+  { id: "bs_ch2", brand: "TATA-REAGENTS", pack: "STEEL DRUMS", kg: 200, stock: 220, supplier: "Siddharth Steels Ltd", leadTime: "12 days", notes: "Internal lacquer coated drums" },
+  { id: "bs_ch3", brand: "RELIANCE-FEED", pack: "IBC TOTES", kg: 1000, stock: 35, supplier: "Schütz India Pvt Ltd", leadTime: "15 days", notes: "Metal frame pallet containers" },
+
+  // Salts
+  { id: "bs_sa1", brand: "KUTCH-SALT", pack: "PP SALT BAGS", kg: 50, stock: 6000, supplier: "Reliance Polyweave", leadTime: "5 days", notes: "Laminated woven polypropylene" },
+  { id: "bs_sa2", brand: "HIMALAYAN-ROCK", pack: "HDPE SALT BAGS", kg: 25, stock: 1200, supplier: "Gwalior Bags Ltd", leadTime: "7 days", notes: "High strength hermetic liners" },
+  { id: "bs_sa3", brand: "PURE-WHITE", pack: "JUMBO FIBC BAGS", kg: 1000, stock: 180, supplier: "Gujarat FIBC Mills", leadTime: "8 days", notes: "Static dissipative bulk bags" },
+
+  // Tiles
+  { id: "bs_tl1", brand: "KAJARIA-EXPORT", pack: "WOODEN PALLETS", kg: 1, stock: 150, supplier: "Malabar Timber Mills", leadTime: "6 days", notes: "ISPM-15 heat-treated wood palettes" },
+  { id: "bs_tl2", brand: "KAJARIA-EXPORT", pack: "CARDBOARD BOXES", kg: 1, stock: 15000, supplier: "Morbi Corrugators & Print", leadTime: "4 days", notes: "Glossy offset litho boxes" },
+  { id: "bs_tl3", brand: "NOT-DEFINED", pack: "STRAPPED CRATES", kg: 1, stock: 80, supplier: "Malabar Timber Mills", leadTime: "7 days", notes: "Strapped marble & granite slabs wood frames" },
+
+  // Generic
+  { id: "bs_gn1", brand: "NOT-DEFINED", pack: "STANDARD CARTONS", kg: 20, stock: 2000, supplier: "Diamond Box Corp", leadTime: "3 days", notes: "Brown master shippers" }
+];
+
+export const INITIAL_DOHA_IMPORT: DohaImportData = {
+  fcl: 2,
+  bagsPerFcl: 743,
+  dutyPct: 0,
+  dutyBase: 0,
+  rows: [
+    { id: "doh1", name: "RECEIPTED CHARGES", rate: 1575, apply: "fcl" },
+    { id: "doh2", name: "PORT CHARGES", rate: 50, apply: "fcl" },
+    { id: "doh3", name: "INSPECTION", rate: 160, apply: "fcl" },
+    { id: "doh4", name: "LEGALIZATION (BAYAN) / Shipment or BL", rate: 1450, apply: "shipment" },
+    { id: "doh5", name: "TRANSPORT", rate: 650, apply: "fcl" },
+    { id: "doh6", name: "CLEARANCE Charges", rate: 100, apply: "fcl" },
+    { id: "doh7", name: "Unloading", rate: 250, apply: "fcl" }
+  ]
+};
+
+export const INITIAL_LINE_ITEMS: ExpenseItem[] = [
+  { id: "lch1", name: "THC Charges", qty: 1, rate: 18250, gst: 18, isTransport: false, apply: "fcl" },
+  { id: "lch2", name: "Mandatory User Charges", qty: 1, rate: 170, gst: 18, isTransport: false, apply: "fcl" },
+  { id: "lch3", name: "Seal Charges", qty: 1, rate: 350, gst: 18, isTransport: false, apply: "fcl" },
+  { id: "lch4", name: "BL Charges", qty: 1, rate: 6500, gst: 18, isTransport: false, apply: "bl" }
+];
+
+export const INITIAL_CFS_ITEMS: ExpenseItem[] = [
+  { id: "cfs1", name: "Agency Fees", qty: 1, rate: 2100, gst: 0, isTransport: false, apply: "shipment" },
+  { id: "cfs2", name: "Phyto Charges", qty: 1, rate: 500, gst: 0, isTransport: false, apply: "shipment" },
+  { id: "cfs3", name: "Fumigation Charges", qty: 1, rate: 1850, gst: 0, isTransport: false, apply: "shipment" },
+  { id: "cfs4", name: "Transportation Charges", qty: 1, rate: 39200, gst: 0, isTransport: true, apply: "fcl" },
+  { id: "cfs5", name: "LOLO Charges", qty: 1, rate: 0, gst: 0, isTransport: false, apply: "fcl", receipt: true },
+  { id: "cfs6", name: "Craft Paper Charges", qty: 1, rate: 500, gst: 0, isTransport: false, apply: "shipment" },
+  { id: "cfs7", name: "Silica Gel Charges (4 Kg per Container)", qty: 1, rate: 400, gst: 0, isTransport: false, apply: "fcl" },
+  { id: "cfs8", name: "Documentation Charges", qty: 1, rate: 200, gst: 0, isTransport: false, apply: "bl" },
+  { id: "cfs9", name: "VGM Charges", qty: 1, rate: 250, gst: 0, isTransport: false, apply: "fcl" },
+  { id: "cfs10", name: "CMC Charges", qty: 1, rate: 100, gst: 0, isTransport: false, apply: "shipment" },
+  { id: "cfs11", name: "Check Packages Charges", qty: 1, rate: 0, gst: 0, isTransport: false, apply: "shipment", receipt: true },
+  { id: "cfs12", name: "Check Packages Custom Examination", qty: 1, rate: 3000, gst: 0, isTransport: false, apply: "shipment" }
+];
+
+export const INITIAL_RATES: RateRow[] = [
+  { id: 1, dest: "DAMMAM", commodity: "1121 GOLDEN SELLA BASMATI RICE", brand: "NOT-DEFINED", packed: "JUTE BAGS", size: "RICE 40 KG", master: "NO", crop: "OLD", year: "2024", rate: 1130, condition: "CIF", paymentTerms: "LC at Sight", numFCL: 1, weightPerContainerKg: 26000, totalWeightKg: 26000, date: "2026-01-01" },
+  { id: 2, dest: "DAMMAM", commodity: "1121 STEAM BASMATI RICE", brand: "NOT-DEFINED", packed: "JUTE BAGS", size: "RICE 40 KG", master: "NO", crop: "OLD", year: "2024", rate: 1040, condition: "CIF", paymentTerms: "LC at Sight", numFCL: 1, weightPerContainerKg: 26000, totalWeightKg: 26000, date: "2026-01-01" },
+  { id: 3, dest: "DAMMAM", commodity: "IR-64 PARBOILED RICE", brand: "NOT-DEFINED", packed: "JUTE BAGS", size: "RICE 40 KG", master: "NO", crop: "OLD", year: "2024", rate: 470, condition: "CIF", paymentTerms: "TT Advance", numFCL: 1, weightPerContainerKg: 26000, totalWeightKg: 26000, date: "2026-01-01" },
+  { id: 4, dest: "DAMMAM", commodity: "SONA MASOORI STEAM RICE", brand: "NOT-DEFINED", packed: "NON WOVEN BAGS", size: "RICE 35 KG", master: "NO", crop: "NEW", year: "2025", rate: 565, condition: "CIF", paymentTerms: "LC at Sight", numFCL: 1, weightPerContainerKg: 26000, totalWeightKg: 26000, date: "2026-01-01" },
+  { id: 5, dest: "SALALAH", commodity: "SONA MASOORI STEAM RICE", brand: "PRAN", packed: "BOPP BAGS", size: "RICE 18 KG", master: "NO", crop: "OLD", year: "2024", rate: 585, condition: "CIF", paymentTerms: "TT Advance", numFCL: 1, weightPerContainerKg: 26000, totalWeightKg: 26000, date: "2026-01-01" },
+  { id: 6, dest: "SALALAH", commodity: "PR-11 SELLA RICE", brand: "PRAN", packed: "BOPP BAGS", size: "RICE 20 KG", master: "NO", crop: "OLD", year: "2024", rate: 625, condition: "CIF", paymentTerms: "LC at Sight", numFCL: 2, weightPerContainerKg: 26000, totalWeightKg: 52000, date: "2026-01-01" },
+  { id: 7, dest: "SALALAH", commodity: "1509 STEAM BASMATI RICE", brand: "RETAJ", packed: "BOPP BAGS", size: "RICE 35 KG", master: "NO", crop: "OLD", year: "2025", rate: 1055, condition: "CIF", paymentTerms: "LC at Sight", numFCL: 1, weightPerContainerKg: 26000, totalWeightKg: 26000, date: "2026-01-01" },
+  { id: 8, dest: "HAMAD", commodity: "SONA MASOORI STEAM RICE", brand: "PRAN", packed: "NON WOVEN BAGS", size: "RICE 35 KG", master: "NO", crop: "NEW", year: "2025", rate: 495, condition: "CIF", paymentTerms: "TT Advance", numFCL: 2, weightPerContainerKg: 26000, totalWeightKg: 52000, date: "2026-01-01" },
+  { id: 9, dest: "HAMAD", commodity: "1509 STEAM BASMATI RICE", brand: "PRAN", packed: "BOPP BAGS", size: "RICE 5 KG", master: "YES", crop: "NEW", year: "2025", rate: 960, condition: "CIF", paymentTerms: "TT Advance & LC", numFCL: 1, weightPerContainerKg: 26000, totalWeightKg: 26000, date: "2026-01-01" },
+  { id: 10, dest: "JEBEL ALI", commodity: "1121 STEAM BASMATI RICE", brand: "NOORA GOLD", packed: "BOPP BAGS", size: "RICE 20 KG", master: "NO", crop: "NEW", year: "2025", rate: 1070, condition: "CIF", paymentTerms: "LC at Sight", numFCL: 3, weightPerContainerKg: 26000, totalWeightKg: 78000, date: "2026-01-01" },
+  { id: 11, dest: "NEWARK", commodity: "SONA MASOORI STEAM RICE", brand: "PRAN", packed: "NON WOVEN BAGS", size: "RICE 5 KG", master: "YES", crop: "NEW", year: "2025", rate: 785, condition: "CIF", paymentTerms: "LC at Sight", numFCL: 1, weightPerContainerKg: 26000, totalWeightKg: 26000, date: "2026-01-01" }
+];
