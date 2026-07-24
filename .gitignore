@@ -1,0 +1,72 @@
+# Dependencies
+node_modules/
+
+# Build output
+build/
+dist/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment & secrets
+.env*
+!.env.example
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Bun / Vite caches
+.bun/
+.vite/
+.cache/
+
+# Local TypeScript build info
+*.tsbuildinfo
+
+# Public source archives (regenerate locally if needed)
+public/project-source.zip
+public/project-source.tar.gz
+
+# One-off patch / debug scripts and trace logs (not part of the shipped app)
+scripts/
+
+# Stray debug / error dumps
+/mems.json
+
+# Empty placeholder lockfile (project uses npm; switch to bun if you want this)
+/bun.lock
+# Root-level dev / migration helpers & debug dumps
+/patch_*.sh
+/patch_*.cjs
+/fix_*.sh
+/fix_*.cjs
+/fix.sh
+/fix_all.cjs
+/fix_dupes.cjs
+/fix_end.cjs
+/fix_sec2.cjs
+/fix_generic*.cjs
+/find_sections.cjs
+/update*.cjs
+/test_firebase_meta.cjs
+/trace*.cjs
+/out.txt
+/missing_block.txt
+/check_block.txt
+/b1.txt
+/b2.txt
+/b3.txt
+/part0.txt
+/part4.txt
+/section2_first.txt
+/section2_last.txt

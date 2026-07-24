@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    counter-reset: pageNum;
+  }
+  
+  .no-print, 
+  .no-print * {
+    display: none !important;
+  }
+
+  .page-number-text::after {
+    counter-increment: pageNum;
+    content: counter(pageNum);
+  }
+}

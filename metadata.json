@@ -1,0 +1,6 @@
+{
+  "name": "Rice Export Manager",
+  "description": "A comprehensive responsive system designed to manage ex-mill prices, bag stocks, CFS/transport, Doha landing overheads, multi-port quotes, and shipping documents.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

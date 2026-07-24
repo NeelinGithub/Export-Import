@@ -1,0 +1,123 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net - Catch-all default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Core Helper Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email != null && request.auth.token.email.lower() == 'vnp.viren@gmail.com') ||
+        (exists(/databases/$(database)/documents/user_memberships/$(request.auth.uid)) && get(/databases/$(database)/documents/user_memberships/$(request.auth.uid)).data.userEmail != null && get(/databases/$(database)/documents/user_memberships/$(request.auth.uid)).data.userEmail.lower() == 'vnp.viren@gmail.com')
+      );
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Alphanumeric, underscores, hyphens, colons, dots, and at-signs allowed
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\:\\@\\.]+$');
+    }
+
+    // Fetch the active user's associated Licence Key (Tenant ID) from their membership doc
+    function getTenantId() {
+      return get(/databases/$(database)/documents/user_memberships/$(request.auth.uid)).data.tenantId;
+    }
+
+    // 1. Memberships Mapping: userId -> tenantId (Licence Key)
+    match /user_memberships/{userId} {
+      allow get: if true;
+      allow list: if true;
+      allow delete: if isAdmin();
+      allow delete: if isAdmin();
+      allow create, update: if isSignedIn() && (request.auth.uid == userId || isAdmin()) && isValidId(userId);
+    }
+
+    // 2. Licences Metadata: details regarding the Licence registration
+    match /licences/{tenantId} {
+      allow get: if true;
+      allow list: if true;
+      allow delete: if isAdmin();
+      allow create, update: if isSignedIn() 
+        && isValidId(tenantId) 
+        && (incoming().ownerId == request.auth.uid || getTenantId() == tenantId || isAdmin());
+    }
+
+    // 3. Shared Tenant Profiles: commodities, prices, stocks, calculation rates for the entire Licence
+    match /tenant_profiles/{tenantId} {
+      allow read, write: if isSignedIn() && isValidId(tenantId) && (getTenantId() == tenantId || isAdmin());
+    }
+
+    // 4. Quotations: shared saved shipment sheets
+    match /quotes/{quoteId} {
+      allow get, delete: if isSignedIn() 
+        && isValidId(quoteId) 
+        && (getTenantId() == existing().tenantId || isAdmin());
+
+      // Query Security List Enforcer
+      allow list: if isSignedIn() && (resource.data.tenantId == getTenantId() || isAdmin());
+
+      allow create: if isSignedIn() 
+        && isValidId(quoteId) 
+        && (getTenantId() == incoming().tenantId || isAdmin());
+
+      allow update: if isSignedIn() 
+        && isValidId(quoteId) 
+        && (getTenantId() == existing().tenantId || isAdmin())
+        && (getTenantId() == incoming().tenantId || isAdmin());
+    }
+
+    // 5. Public Tracking: Allow secure, unauthenticated lookups for direct buyers by B/L code
+    match /public_tracking/{blNo} {
+      allow get: if isValidId(blNo);
+      allow list: if false; // strictly restrict catalog enumeration to keep client privacy 100% safe
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // 6. User Login Audits
+    match /user_logins/{loginId} {
+      allow create: if isSignedIn();
+      allow read, write, list: if isAdmin();
+    }
+
+    // 7. Gen Logs
+    match /document_generations/{genId} {
+      allow create: if isSignedIn();
+      allow read, list: if isSignedIn() && (getTenantId() == resource.data.tenantId || isAdmin());
+    }
+
+    // 8. Global HS Codes Database
+    match /{collection}/{hsId} {
+      allow read: if collection.matches('hs_codes_.*');
+      allow write: if collection.matches('hs_codes_.*') && isSignedIn()
+         && isValidId(hsId)
+         && incoming().itemName is string && incoming().itemName.size() <= 200
+         && incoming().hsCode is string && incoming().hsCode.size() <= 50;
+    }
+
+    // 9. Uploaded Files online persistence
+    match /uploaded_files/{fileId} {
+      allow get: if isSignedIn() && isValidId(fileId);
+      allow list: if isAdmin();
+      allow create, update, delete: if isSignedIn() && isValidId(fileId);
+
+      match /chunks/{chunkId} {
+        allow read: if isSignedIn() && isValidId(chunkId);
+        allow write: if isSignedIn() && isValidId(chunkId);
+      }
+    }
+  }
+}
